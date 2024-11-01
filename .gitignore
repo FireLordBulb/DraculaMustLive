@@ -1,5 +1,7 @@
 # Visual Studio 2015 user specific files
 .vs/
+# JetBrains specific files
+/.idea
 
 # Compiled Object files
 *.slo
@@ -72,3 +74,9 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+# Assets too large for GitHub
+/Content/DungeonCastle/
+/Content/PolygonFantasyCharacters/
+/Content/PolygonHorrorMansion/
+/Content/BlockingStarterPack

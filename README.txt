@@ -1,0 +1,2 @@
+Find assets too large for GitHub that are gitignored at:
+https://changemakereducation-my.sharepoint.com/:u:/g/personal/vilgot_ottestig_edu_futuregames_nu/EX9lzAsjZbpMrfaEuDBYdR0Boqsy5f5CZQKmzqyNkfH45A?e=p83Trq
