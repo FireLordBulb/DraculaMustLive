@@ -32,6 +32,9 @@ void AScythe::Throw(bool IsHoldActive)
 	// TODO: Replace with direction toward lineTrace from center of screen.
 	ThrowDirection = GetActorForwardVector();
 	StateChanger.Set(EScytheState::Thrown, this);
+	FRotator Rotation = GetActorRotation();
+	Rotation.Roll = ThrowRollAngle;
+	SetActorRotation(Rotation);
 }
 
 void AScythe::Recall(bool IsHoldActive)
