@@ -25,11 +25,11 @@ public:
 	
 private:
 	UFUNCTION(BlueprintCallable)
-	void OnInputStarted();
+	void OnInputStarted() const;
 	UFUNCTION(BlueprintCallable)
-	void OnInputCompleted();
+	void OnInputCompleted() const;
 	UFUNCTION(BlueprintCallable)
-	void OnInputOngoing(const float ElapsedTime);
+	void OnInputOngoing(const float ElapsedSeconds);
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AScythe> ScytheClass;
@@ -37,5 +37,5 @@ private:
 	UPROPERTY()
 	AScythe* Scythe = nullptr;
 
-	bool bHoldIsActive = false;
+	bool IsHoldActive = false;
 };

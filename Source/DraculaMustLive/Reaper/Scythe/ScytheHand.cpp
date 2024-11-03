@@ -1,6 +1,6 @@
 #include "ScytheHand.h"
-
 #include "Scythe.h"
+#include "Kismet/GameplayStatics.h"
 
 UScytheHand::UScytheHand()
 {
@@ -8,25 +8,34 @@ UScytheHand::UScytheHand()
 
 void UScytheHand::BeginPlay()
 {
-	Scythe = GetWorld()->SpawnActor<AScythe>(ScytheClass, GetComponentTransform());
-	Scythe->AttachToComponent(this, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
+	Scythe = Cast<AScythe>(UGameplayStatics::BeginDeferredActorSpawnFromClass(GetWorld(), ScytheClass, GetComponentTransform()));
+	Scythe->SetHand(this);
+	UGameplayStatics::FinishSpawningActor(Scythe, GetComponentTransform());
 	Super::BeginPlay();
 }
 
-void UScytheHand::OnInputStarted()
+void UScytheHand::OnInputStarted() const
 {
-	// TODO: Forward to comboClick start
-	Scythe = &*Scythe;
+	Scythe->StartComboClick();
 }
 
-void UScytheHand::OnInputCompleted()
+void UScytheHand::OnInputCompleted() const
 {
-	// TODO: Forward to throw/recall start
-	Scythe = &*Scythe;
+	switch(Scythe->GetState())
+	{
+	case EScytheState::Held:
+	case EScytheState::Recalled:
+		Scythe->Throw(IsHoldActive);
+		break;
+	case EScytheState::Thrown:
+	case EScytheState::Stuck:
+		Scythe->Recall(IsHoldActive);	
+		break;
+	}
 }
 
-void UScytheHand::OnInputOngoing(const float ElapsedTime)
+void UScytheHand::OnInputOngoing(const float ElapsedSeconds)
 {
 	// TODO: implement bHoldIsActive setting
-	bHoldIsActive = !!bHoldIsActive;
+	IsHoldActive = !!IsHoldActive;
 }
