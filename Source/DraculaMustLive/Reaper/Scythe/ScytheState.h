@@ -1,6 +1,7 @@
 #pragma once
 
-enum class EScytheState
+UENUM(BlueprintType)
+enum class EScytheState : uint8
 {
 	Held,
 	Thrown,
