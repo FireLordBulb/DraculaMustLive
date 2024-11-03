@@ -79,11 +79,11 @@ void AScythe::Tick(float DeltaTime)
 void AScythe::PawnOverlap(AActor* OtherActor, bool IsLargeHitbox)
 {
 	EScytheState State = StateChanger.Get();
-	if (State == EScytheState::Thrown || State == EScytheState::Recalled || Reaper == OtherActor)
+	if (!(State == EScytheState::Thrown || State == EScytheState::Recalled) || Reaper == OtherActor)
 	{
 		return;
 	}
-	auto Health= OtherActor->GetComponentByClass<UHealth>();
+	auto Health = OtherActor->GetComponentByClass<UHealth>();
 	if (!Health)
 	{
 		return;

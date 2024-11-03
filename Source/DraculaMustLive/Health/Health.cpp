@@ -29,9 +29,11 @@ void UHealth::Heal(const float Amount)
 bool UHealth::TakeDamage(const float Amount)
 {
 	Current -= Amount;
+	UE_LOG(LogTemp, Log, TEXT("Health left: %f"), Current);
 	if (Current < 0)
 	{
 		Current = 0;
+		GetOwner()->Destroy();
 		return false;
 	}
 	return true;
