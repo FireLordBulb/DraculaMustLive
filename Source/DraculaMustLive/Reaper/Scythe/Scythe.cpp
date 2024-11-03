@@ -16,3 +16,23 @@ void AScythe::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
+
+void AScythe::FStateChanger::Set(const EScytheState InState, AScythe* Scythe)
+{
+	switch (InState)
+	{
+	case EScytheState::Held:
+		Scythe->StateChanger.Set(InState, Scythe);
+		break;
+	case EScytheState::Thrown:
+		
+		break;
+	case EScytheState::Stuck:
+	
+		break;
+	case EScytheState::Recalled:
+		
+		break;
+	}
+	State = InState;
+}

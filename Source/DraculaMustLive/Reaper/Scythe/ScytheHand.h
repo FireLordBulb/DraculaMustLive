@@ -13,14 +13,16 @@ class DRACULAMUSTLIVE_API UScytheHand : public USceneComponent
 public:
 	UScytheHand();
 
+protected:
+	virtual void BeginPlay() override;
+
+public: 
 	UFUNCTION(BlueprintCallable)
 	AScythe* GetScythe() const
 	{
 		return Scythe;
 	}
-protected:
-	virtual void BeginPlay() override;
-
+	
 private:
 	UFUNCTION(BlueprintCallable)
 	void OnInputStarted();
