@@ -1,6 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "ScytheState.h"
+#include "ScytheUpgrades.h"
 #include "GameFramework/Actor.h"
 #include "Scythe.generated.h"
 
@@ -48,18 +49,31 @@ private:
 
 	void StartMoving(bool DoRotateClockwise);
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, meta = (Category = "Scythe|Damage"))
 	float BaseDamage = 10;
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, meta = (Category = "Scythe|Damage"))
 	float RecallDamage = 10;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, meta = (Category = "Scythe|Movement"))
 	float FlySpeed = 1000;
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, meta = (Category = "Scythe|Movement"))
 	float SpinSpeed = -1000;
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, meta = (Category = "Scythe|Movement", ClampMin = -180, ClampMax = 180))
 	float ThrowRollAngle = 90;
+	UPROPERTY(EditDefaultsOnly, meta = (Category = "Scythe|Movement", ClampMin = 0, ClampMax = 1))
+	float RecallPowerBase = 0.01f;
+	UPROPERTY(EditDefaultsOnly, meta = (Category = "Scythe|Movement", ClampMin = 0, ClampMax = 1))
+	float RecallCloseEnoughAlpha = 0.1f;
+	UPROPERTY(EditDefaultsOnly, meta = (Category = "Scythe|Movement", ClampMin = -1, ClampMax = +1))
+	float GrazeMaxDotProduct = 0.5f;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess, Category = "Scythe|Upgrades"))
+	FPiercingAttack PiercingUpgrade;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess, Category = "Scythe|Upgrades"))
+	FDashAttack DashUpgrade;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess, Category = "Scythe|Upgrades"))
+	FChargedAttack ChargeUpgrade;
+	
 	UPROPERTY()
 	USceneComponent* Hand = nullptr;
 	UPROPERTY()
