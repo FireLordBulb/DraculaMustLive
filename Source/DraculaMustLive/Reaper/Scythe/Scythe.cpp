@@ -3,6 +3,7 @@
 #include "DraculaMustLive/Health/Health.h"
 // ReSharper disable once CppUnusedIncludeDirective // This isn't unused, it's needed for pointer equality checks of Reaper.
 #include "GameFramework/Character.h"
+#include "Kismet/KismetMathLibrary.h"
 
 AScythe::AScythe()
 {
@@ -29,11 +30,19 @@ void AScythe::Throw(bool IsHoldActive)
 		return;
 	}
 	StateChanger.Set(EScytheState::Thrown, this);
-	// TODO: Replace with direction toward lineTrace from center of screen.
+	
+	auto PlayerCameraManager = GetWorld()->GetPlayerControllerIterator()->Get()->PlayerCameraManager;
+	FVector CameraLocation = PlayerCameraManager->GetCameraLocation();
+	FVector CameraRotation = PlayerCameraManager->GetCameraRotation().RotateVector(FVector::ForwardVector);
+	FVector TraceEnd = CameraLocation + VeryLongDistance*CameraRotation;
+	
+	FHitResult HitResult;
+	GetWorld()->LineTraceSingleByChannel(HitResult, CameraLocation, TraceEnd, ECC_Visibility, FCollisionQueryParams(FName(),  false, Reaper));
+
+	FRotator RotationTowardCrosshairTarget = UKismetMathLibrary::FindLookAtRotation(CameraLocation, HitResult.bBlockingHit ? HitResult.Location : TraceEnd);
+	RotationTowardCrosshairTarget.Roll = ThrowRollAngle;
+	SetActorRotation(RotationTowardCrosshairTarget);
 	ThrowDirection = GetActorForwardVector();
-	FRotator Rotation = GetActorRotation();
-	Rotation.Roll = ThrowRollAngle;
-	SetActorRotation(Rotation);
 }
 
 void AScythe::Recall(bool IsHoldActive)

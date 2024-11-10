@@ -95,4 +95,6 @@ private:
 			}
 	};
 	FStateChanger StateChanger;
+
+	static constexpr float VeryLongDistance = 10000;
 };
