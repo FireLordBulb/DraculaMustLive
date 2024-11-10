@@ -6,7 +6,6 @@
 
 AScythe::AScythe()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 }
 
@@ -29,9 +28,9 @@ void AScythe::Throw(bool IsHoldActive)
 		// TODO: buffered combo input
 		return;
 	}
+	StateChanger.Set(EScytheState::Thrown, this);
 	// TODO: Replace with direction toward lineTrace from center of screen.
 	ThrowDirection = GetActorForwardVector();
-	StateChanger.Set(EScytheState::Thrown, this);
 	FRotator Rotation = GetActorRotation();
 	Rotation.Roll = ThrowRollAngle;
 	SetActorRotation(Rotation);
@@ -58,20 +57,25 @@ void AScythe::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	switch (StateChanger.Get())
 	{
+	case EScytheState::Held:
+	case EScytheState::Stuck:
+		break;
 	case EScytheState::Thrown:
 		AddActorWorldOffset(FlySpeed*DeltaTime*ThrowDirection);
 		TickRotation(DeltaTime);
 		break;
 	case EScytheState::Recalled:
+		float RecallAlpha = FMath::Pow(RecallPowerBase, DeltaTime);
+		float LinearSpeedAlpha = 1-DeltaTime*FlySpeed/FVector::Distance(GetActorLocation(), Hand->GetComponentLocation());
+		RecallAlpha = FMath::Min(RecallAlpha, LinearSpeedAlpha);
+		if (RecallCloseEnoughAlpha < RecallAlpha)
 		{
-			FVector NewLocation = Hand->GetComponentLocation();
-			// TODO: Exponential into linear return speed.
-			SetActorLocation(NewLocation);
+			SetActorLocation(FMath::Lerp(Hand->GetComponentLocation(), GetActorLocation(), RecallAlpha));
 			TickRotation(DeltaTime);
+		} else
+		{
 			MakeHeld();
 		}
-		break;
-	default:
 		break;
 	}
 }

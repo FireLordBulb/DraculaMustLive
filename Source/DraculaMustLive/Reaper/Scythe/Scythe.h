@@ -68,11 +68,11 @@ private:
 	float GrazeMaxDotProduct = 0.5f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess, Category = "Scythe|Upgrades"))
-	FPiercingAttack PiercingUpgrade;
+	FPiercingAttack PiercingUpgrade = FPiercingAttack();
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess, Category = "Scythe|Upgrades"))
-	FDashAttack DashUpgrade;
+	FDashAttack DashUpgrade = FDashAttack();
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess, Category = "Scythe|Upgrades"))
-	FChargedAttack ChargeUpgrade;
+	FChargedAttack ChargeUpgrade = FChargedAttack();
 	
 	UPROPERTY()
 	USceneComponent* Hand = nullptr;
