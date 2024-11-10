@@ -52,8 +52,8 @@ void AScythe::Recall(bool IsHoldActive)
 
 void AScythe::StartComboClick()
 {
-	// TODO
-	FlySpeed = FlySpeed+1-1;
+	// TODO: Check timing window and also set PiercingUpgrade.DidClickTooEarly accordingly.
+	PiercingUpgrade.WasComboClickStarted = true;
 }
 
 void AScythe::MakeHeld()
