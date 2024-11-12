@@ -1,6 +1,14 @@
 #pragma once
 #include "ScytheUpgrades.generated.h"
 
+enum class EPiercingState : uint8
+{
+	Inactive,
+	ClickedTooEarly,
+	MouseDown,
+	Active
+};
+
 USTRUCT(BlueprintType)
 struct DRACULAMUSTLIVE_API FPiercingAttack
 {
@@ -24,9 +32,7 @@ struct DRACULAMUSTLIVE_API FPiercingAttack
 	UPROPERTY(EditDefaultsOnly)
 	float SpeedMultiplier = 2;
 
-	bool IsActive;
-	bool DidClickTooEarly;
-	bool WasComboClickStarted;
+	EPiercingState State;
 	float LatestActivationTime;
 };
 

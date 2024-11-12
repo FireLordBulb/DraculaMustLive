@@ -26,7 +26,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Recall(bool IsHoldActive);
 	UFUNCTION(BlueprintCallable)
-	void StartComboClick();
+	void StartMouseClick();
 	UFUNCTION(BlueprintCallable)
 	void MakeHeld();
 
@@ -49,6 +49,9 @@ private:
 
 	void StartMoving(bool DoRotateClockwise);
 
+	UPROPERTY(EditDefaultsOnly, meta = (Category = "Scythe"))
+	float MinRecallDelay = 0.1f;
+	
 	UPROPERTY(EditDefaultsOnly, meta = (Category = "Scythe|Damage"))
 	float BaseDamage = 10;
 	UPROPERTY(EditDefaultsOnly, meta = (Category = "Scythe|Damage"))
@@ -79,6 +82,8 @@ private:
 	UPROPERTY()
 	ACharacter* Reaper = nullptr;
 
+	float EarliestRecallTime = 0;
+	
 	FVector ThrowDirection;
 	
 	int8 RotationSign = +1;

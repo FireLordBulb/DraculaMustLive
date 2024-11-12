@@ -3,6 +3,8 @@
 #include "Components/SceneComponent.h"
 #include "ScytheHand.generated.h"
 
+class UInputMappingContext;
+class UInputAction;
 class AScythe;
 
 UCLASS(ClassGroup=(Custom), Blueprintable, meta=(BlueprintSpawnableComponent))
@@ -33,9 +35,16 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AScythe> ScytheClass;
-
+	
+	UPROPERTY(EditDefaultsOnly)
+	UInputMappingContext* MappingContext = nullptr;
+	UPROPERTY(EditDefaultsOnly)
+	UInputAction* InputAction = nullptr;
+	
 	UPROPERTY()
 	AScythe* Scythe = nullptr;
+	
+	float HoldTimeThreshold = 1;
 
 	bool IsHoldActive = false;
 };

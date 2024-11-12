@@ -30,6 +30,7 @@ void AScythe::Throw(bool IsHoldActive)
 		return;
 	}
 	StateChanger.Set(EScytheState::Thrown, this);
+	EarliestRecallTime = MinRecallDelay+GetWorld()->GetTimeSeconds();
 	
 	auto PlayerCameraManager = GetWorld()->GetPlayerControllerIterator()->Get()->PlayerCameraManager;
 	FVector CameraLocation = PlayerCameraManager->GetCameraLocation();
@@ -47,13 +48,16 @@ void AScythe::Throw(bool IsHoldActive)
 
 void AScythe::Recall(bool IsHoldActive)
 {
-	StateChanger.Set(EScytheState::Recalled, this);
+	if (EarliestRecallTime < GetWorld()->GetTimeSeconds())
+	{
+		StateChanger.Set(EScytheState::Recalled, this);
+	}
 }
 
-void AScythe::StartComboClick()
+void AScythe::StartMouseClick()
 {
 	// TODO: Check timing window and also set PiercingUpgrade.DidClickTooEarly accordingly.
-	PiercingUpgrade.WasComboClickStarted = true;
+	PiercingUpgrade.State = EPiercingState::MouseDown;
 }
 
 void AScythe::MakeHeld()
