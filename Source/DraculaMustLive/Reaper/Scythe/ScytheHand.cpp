@@ -2,9 +2,7 @@
 #include "Scythe.h"
 #include "Kismet/GameplayStatics.h"
 #include "InputMappingContext.h" 
-#include "GameFramework/PlayerInput.h"
 #include "EnhancedInputSubsystems.h"
-#include "WorldPartition/ContentBundle/ContentBundleLog.h"
 
 UScytheHand::UScytheHand()
 {
@@ -30,6 +28,7 @@ void UScytheHand::BeginPlay()
 	Scythe = Cast<AScythe>(UGameplayStatics::BeginDeferredActorSpawnFromClass(GetWorld(), ScytheClass, GetComponentTransform()));
 	Scythe->SetHand(this);
 	UGameplayStatics::FinishSpawningActor(Scythe, GetComponentTransform());
+	
 	Super::BeginPlay();
 }
 

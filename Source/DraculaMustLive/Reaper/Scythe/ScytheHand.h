@@ -7,7 +7,7 @@ class UInputMappingContext;
 class UInputAction;
 class AScythe;
 
-UCLASS(ClassGroup=(Custom), Blueprintable, meta=(BlueprintSpawnableComponent))
+UCLASS(ClassGroup = (Custom), Blueprintable, meta = (BlueprintSpawnableComponent))
 class DRACULAMUSTLIVE_API UScytheHand : public USceneComponent
 {
 	GENERATED_BODY()
@@ -43,7 +43,8 @@ private:
 	
 	UPROPERTY()
 	AScythe* Scythe = nullptr;
-	
+
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess))
 	float HoldTimeThreshold = 1;
 
 	bool IsHoldActive = false;
