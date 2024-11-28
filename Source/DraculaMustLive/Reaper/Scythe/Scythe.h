@@ -30,7 +30,9 @@ public:
 	void StartMouseClick();
 	UFUNCTION(BlueprintCallable)
 	void MakeHeld();
-
+	UFUNCTION(BlueprintCallable)
+	bool IsInComboWindow() const;
+	
 	virtual void Tick(float DeltaTime) override;
 	
 	UFUNCTION(BlueprintCallable)

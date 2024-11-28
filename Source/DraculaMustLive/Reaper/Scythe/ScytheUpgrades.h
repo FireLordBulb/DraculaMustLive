@@ -34,6 +34,7 @@ struct DRACULAMUSTLIVE_API FPiercingAttack
 
 	EPiercingState State;
 	float LatestActivationTime;
+	float Damage;
 };
 
 USTRUCT(BlueprintType)

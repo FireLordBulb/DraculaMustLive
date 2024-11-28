@@ -14,7 +14,9 @@ void AScythe::BeginPlay()
 {
 	MakeHeld();
 	Reaper = GetWorld()->GetPlayerControllerIterator()->Get()->GetCharacter();
+	// Calls BP Event Begin Play in derived BP classes.
 	Super::BeginPlay();
+	PiercingUpgrade.Damage = BaseDamage*PiercingUpgrade.DamageMultiplier;
 }
 
 void AScythe::SetHand(USceneComponent* InHand)
@@ -22,11 +24,14 @@ void AScythe::SetHand(USceneComponent* InHand)
 	Hand = InHand;
 }
 
-void AScythe::Throw(bool IsHoldActive)
+void AScythe::Throw(const bool IsHoldActive)
 {
+	if (PiercingUpgrade.State == EPiercingState::MouseDown && (IsInComboWindow() || IsHoldActive && ChargeUpgrade.IsUnlocked))
+ 	{
+ 		PiercingUpgrade.State = EPiercingState::Active;
+ 	}
 	if (StateChanger.Get() != EScytheState::Held)
 	{
-		// TODO: buffered combo input
 		return;
 	}
 	StateChanger.Set(EScytheState::Thrown, this);
@@ -56,13 +61,29 @@ void AScythe::Recall(bool IsHoldActive)
 
 void AScythe::StartMouseClick()
 {
-	// TODO: Check timing window and also set PiercingUpgrade.DidClickTooEarly accordingly.
-	PiercingUpgrade.State = EPiercingState::MouseDown;
+	if (!PiercingUpgrade.IsUnlocked || PiercingUpgrade.State == EPiercingState::ClickedTooEarly)
+	{
+		return;
+	}
+	PiercingUpgrade.State = IsInComboWindow() ? EPiercingState::MouseDown : EPiercingState::ClickedTooEarly;
 }
 
 void AScythe::MakeHeld()
 {
 	StateChanger.Set(EScytheState::Held, this);
+	// Activate buffered piercing throw input.
+	if (PiercingUpgrade.State == EPiercingState::Active)
+	{
+		Throw(false);
+	}
+}
+
+bool AScythe::IsInComboWindow() const
+{
+	auto State = StateChanger.Get();
+	return State == EScytheState::Recalled && FVector::Distance(GetActorLocation(), Hand->GetComponentLocation()) < PiercingUpgrade.ActivationDistance ||
+		   State == EScytheState::Held     && GetWorld()->GetTimeSeconds() < PiercingUpgrade.LatestActivationTime;
+	
 }
 
 void AScythe::Tick(float DeltaTime)
@@ -104,8 +125,9 @@ void AScythe::PawnOverlap(AActor* OtherActor, bool IsLargeHitbox)
 	{
 		return;
 	}
-	bool IsRecalled =  StateChanger.Get() == EScytheState::Recalled;
-	float Damage = IsRecalled ? RecallDamage : BaseDamage;
+	bool IsRecalled = StateChanger.Get() == EScytheState::Recalled;
+	bool IsPiercing = PiercingUpgrade.State == EPiercingState::Active;
+	float Damage = IsPiercing ? PiercingUpgrade.Damage : IsRecalled ? RecallDamage : BaseDamage;
 	if (DidActorSurviveDamage(Health, Damage))
 	{
 		FVector Difference = OtherActor->GetActorLocation()-GetActorLocation();
@@ -153,6 +175,7 @@ void AScythe::FStateChanger::Set(const EScytheState InState, AScythe* Scythe)
 		Scythe->AttachToComponent(Scythe->Hand, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
 		Scythe->SetActorEnableCollision(false);
 		Scythe->PiercedEnemies.Empty();
+		Scythe->PiercingUpgrade.LatestActivationTime = Scythe->PiercingUpgrade.PostCatchTimeWindow+Scythe->GetWorld()->GetTimeSeconds();
 		break;
 	case EScytheState::Thrown:
 		Scythe->SetActorEnableCollision(true);
@@ -161,6 +184,7 @@ void AScythe::FStateChanger::Set(const EScytheState InState, AScythe* Scythe)
 	case EScytheState::Stuck:
 		Scythe->SetActorEnableCollision(false);
 		Scythe->PiercedEnemies.Empty();
+		Scythe->PiercingUpgrade.State = EPiercingState::Inactive;
 		break;
 	case EScytheState::Recalled:
 		Scythe->PiercedEnemies.Empty();
@@ -170,6 +194,7 @@ void AScythe::FStateChanger::Set(const EScytheState InState, AScythe* Scythe)
 		}
 		Scythe->SetActorEnableCollision(true);
 		Scythe->StartMoving(false);
+		Scythe->PiercingUpgrade.State = EPiercingState::Inactive;
 		break;
 	}
 	State = InState;
