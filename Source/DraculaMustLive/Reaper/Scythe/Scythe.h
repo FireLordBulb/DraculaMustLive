@@ -5,6 +5,7 @@
 #include "GameFramework/Actor.h"
 #include "Scythe.generated.h"
 
+class UHealth;
 class UScytheHand;
 
 UCLASS()
@@ -45,6 +46,8 @@ private:
 	UFUNCTION(BlueprintCallable)
 	void StaticOverlap(AActor* OtherActor);
 
+	bool DidActorSurviveDamage(UHealth* Health, float Damage);
+
 	void TickRotation(float DeltaTime);
 
 	void StartMoving(bool DoRotateClockwise);
@@ -81,11 +84,12 @@ private:
 	USceneComponent* Hand = nullptr;
 	UPROPERTY()
 	ACharacter* Reaper = nullptr;
-
+	UPROPERTY()
+	TArray<AActor*> PiercedEnemies;
+	
 	float EarliestRecallTime = 0;
 	
 	FVector ThrowDirection;
-	
 	int8 RotationSign = +1;
 	
 	struct FStateChanger

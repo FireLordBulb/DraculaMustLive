@@ -95,8 +95,7 @@ void AScythe::Tick(float DeltaTime)
 
 void AScythe::PawnOverlap(AActor* OtherActor, bool IsLargeHitbox)
 {
-	EScytheState State = StateChanger.Get();
-	if (!(State == EScytheState::Thrown || State == EScytheState::Recalled) || Reaper == OtherActor)
+	if (Reaper == OtherActor || PiercedEnemies.Contains(OtherActor))
 	{
 		return;
 	}
@@ -105,11 +104,20 @@ void AScythe::PawnOverlap(AActor* OtherActor, bool IsLargeHitbox)
 	{
 		return;
 	}
-	bool DidSurvive = Health->TakeDamage(State == EScytheState::Recalled ? RecallDamage : BaseDamage);
-	if (DidSurvive && State == EScytheState::Thrown)
+	bool IsRecalled =  StateChanger.Get() == EScytheState::Recalled;
+	float Damage = IsRecalled ? RecallDamage : BaseDamage;
+	if (DidActorSurviveDamage(Health, Damage))
 	{
-		AttachToActor(OtherActor, FAttachmentTransformRules(EAttachmentRule::KeepWorld, false));
-		StateChanger.Set(EScytheState::Stuck, this);
+		FVector Difference = OtherActor->GetActorLocation()-GetActorLocation();
+		float GrazeDotProduct = ThrowDirection.Dot(Difference.GetUnsafeNormal());
+		if (IsRecalled || PiercingUpgrade.State == EPiercingState::Active || GrazeDotProduct <  GrazeMaxDotProduct)
+		{
+			PiercedEnemies.Add(OtherActor);
+		} else
+		{
+			AttachToActor(OtherActor, FAttachmentTransformRules(EAttachmentRule::KeepWorld, false));
+			StateChanger.Set(EScytheState::Stuck, this);
+		}
 	}
 }
 
@@ -119,6 +127,11 @@ void AScythe::StaticOverlap(AActor* OtherActor)
 	{
 		StateChanger.Set(EScytheState::Stuck, this);
 	}
+}
+
+bool AScythe::DidActorSurviveDamage(UHealth* Health, float Damage)
+{
+	return Health->TakeDamage(Damage);
 }
 
 void AScythe::TickRotation(const float DeltaTime)
@@ -139,15 +152,23 @@ void AScythe::FStateChanger::Set(const EScytheState InState, AScythe* Scythe)
 	case EScytheState::Held:
 		Scythe->AttachToComponent(Scythe->Hand, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
 		Scythe->SetActorEnableCollision(false);
+		Scythe->PiercedEnemies.Empty();
 		break;
 	case EScytheState::Thrown:
 		Scythe->SetActorEnableCollision(true);
 		Scythe->StartMoving(true);
 		break;
 	case EScytheState::Stuck:
-	
+		Scythe->SetActorEnableCollision(false);
+		Scythe->PiercedEnemies.Empty();
 		break;
 	case EScytheState::Recalled:
+		Scythe->PiercedEnemies.Empty();
+		if (auto* AttachedParent = Scythe->RootComponent->GetAttachParent())
+		{
+			Scythe->PiercedEnemies.Add(AttachedParent->GetOwner());
+		}
+		Scythe->SetActorEnableCollision(true);
 		Scythe->StartMoving(false);
 		break;
 	}
